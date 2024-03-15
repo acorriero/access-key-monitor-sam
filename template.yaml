@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  access-key-monitor-sam
+
+  SAM Template for access-key-monitor-sam
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  AccessKeyMonitorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: access-key-monitor/
+      Handler: app.lambda_handler
+      Runtime: python3.11
+      Architectures:
+        - x86_64
+      Policies:
+      - Statement:
+        - Sid: IAMUserAccess
+          Effect: Allow
+          Action:
+          - iam:List*
+          Resource: 'arn:aws:iam::${{env.Account}}:user/*'
+        - Sid: AllowPublishSNS
+          Effect: Allow
+          Action:
+          - sns:Publish
+          Resource: 'arn:aws:sns:us-east-1:${{env.Account}}:access_key_age_check'
